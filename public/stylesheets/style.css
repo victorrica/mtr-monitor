@@ -1,0 +1,18 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: #30303d; 
+  color: #fff;
+}
+a {
+  color: #00B7FF;
+}
+.lineChart {
+	width	: 100%;
+	height	: 300px;
+	border-bottom: 1px solid #fff;
+}
+.title {
+	border-bottom: 1px solid #fff;
+    padding-bottom: 15px;
+}	

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+	<link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
+    <h1 class="title"><%= title %></h1>
+    
+    <div class="chartBox">		
+    </div>
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+	<script src="https://www.amcharts.com/lib/3/serial.js"></script>
+	<script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+	<script src="https://www.amcharts.com/lib/3/themes/dark.js"></script>
+	<script>
+		var tempData = <%-data%>;
+		var data = [];
+		for(i=0;i<tempData.length;i++) {
+			Ip = tempData[i].sourceIp;
+			if(data[Ip] == undefined) {
+				data[Ip] = new Array();
+			}
+			data[Ip].push({
+				time : tempData[i].startTime,
+				
+				traceDestination : tempData[i].traceDestination,
+				
+				lossPercentage : tempData[i].lossPercentage,
+				
+				tempData :  Math.round(Math.random() * (40 + i / 5)) + 20 + i
+			})
+		}
+		for(dataList in data) {
+			$(".chartBox").append(
+				'<p>' + dataList + '</p>' + '<div id="chart-' + dataList + '" class="lineChart"></div>'
+			);
+			makeChart(dataList,data[dataList]);
+		}
+		
+		function makeChart(chartIp,data) {
+			var chartConfig = {
+			    "type": "serial",
+			    "theme": "dark",
+			    "marginRight": 80,
+			    "autoMarginOffset": 20,
+			    "marginTop": 7,
+			    "dataProvider": data,
+			    "valueAxes": [{
+			        "axisAlpha": 0.2,
+			        "dashLength": 1,
+			        "position": "left"
+			    }],
+			    "mouseWheelZoomEnabled": true,
+			    "graphs": [{
+			        "id": "g1",
+				        "balloonText": "LOSS - [[value]]%\n[[date]]",
+			        "bullet": "round",
+			        "bulletBorderAlpha": 1,
+			        "bulletColor": "#FFFFFF",
+			        "hideBulletsCount": 1,
+			        "title": "red line",
+			        "valueField": "lossPercentage",
+			        "TempField": "tempData",
+			        "DstField": "traceDestination",
+			        "useLineColorForBulletBorder": true,
+			        "balloon":{
+			            "drop":true
+			        }
+			    }],
+			    "chartScrollbar": {
+			        "autoGridCount": true,
+			        "graph": "g1",
+			        "scrollbarHeight": 40
+			    },
+			    "chartCursor": {
+			       "limitToGraph":"g1"
+			    },
+			    "categoryField": "time",
+			    "categoryAxis": {
+			        "parseDates": false,
+			        "axisColor": "#DADADA",
+			        "dashLength": 1,
+			        "minorGridEnabled": true
+			    },
+			    "export": {
+			        "enabled": true
+			    }
+			};
+			var chart = AmCharts.makeChart("chart-" + chartIp, chartConfig);
+			chart.addListener("rendered", zoomChart);
+			zoomChart(data);
+			
+			// this method is called when chart is first inited as we listen for "rendered" event
+			function zoomChart(data) {
+			    // different zoom methods can be used - zoomToIndexes, zoomToDates, zoomToCategoryValues
+			    chart.zoomToIndexes(data.length - 40, data.length - 1);
+			}
+		}
+		
+		// generate some random data, quite different range
+		function generateChartData() {
+		    var chartData = [];
+		    var firstDate = new Date();
+		    firstDate.setDate(firstDate.getDate() - 5);
+		
+		    for (var i = 0; i < 1000; i++) {
+		        // we create date objects here. In your data, you can have date strings
+		        // and then set format of your dates using chart.dataDateFormat property,
+		        // however when possible, use date objects, as this will speed up chart rendering.
+		        var newDate = new Date(firstDate);
+		        newDate.setDate(newDate.getDate() + i);
+		
+		        var visits = Math.round(Math.random() * (40 + i / 5)) + 20 + i;
+		
+		        chartData.push({
+		            date: newDate,
+		            visits: visits,
+		            test: "59.151.175.232"
+		        });
+		    }
+		    return chartData;
+		}
+	</script>
+  </body>
+</html>
